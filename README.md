@@ -11,24 +11,34 @@ XanaduXVD is not yet fully featured, you might want to use [xvdtool](https://git
 - [ ] Drive extraction
 - [ ] XVC support
 - [ ] MSIXVC support
-- [ ] UWA/UWP/UWX support
-- [ ] Header editor & signature manipulation
+- [ ] UWA/UWP/UW9 support
+- [ ] Header editor & signature validation & signature manipulation
 - [ ] Hash tree verification
 - [ ] Hash tree rebuilding
-- [ ] Triming and removal of sections
+- [ ] Trimming and removal of sections
 
 # Project Structure
 - XanaduXVD
   - src
-    - XanaduXVD.h : header definition 
+    - XanaduXVD.h   : header definitions 
     - XanaduXVD.cpp : implementation containing most of the logic for parsing and manipulating XVD files
-    - XVDTypes.h : file containing definitions about the format
+    - XVDTypes.h    : file containing definitions about the format
+    - XVDTypes.cpp  : file containing auxiliary methods to manipulate XVD fields and data structures
+
+- XanaduCLI: A command line utility that uses XanaduXVD
+  - XanaduCLI.cpp (requires XanaduXVD)
    
-- XanaduCLI
-  - A command line utility that uses XanaduXVD
- 
-- XanaduGUI
-  - A graphical user interface that uses XanaduXVD
+- XanaduGUI: A graphical user interface that uses XanaduXVD
+  - XanaduGUI.cpp (COMING SOON!)
  
 # Build
-g++ XanaduXVD.cpp
+Include src/XanaduXVD in your project. For example, to build XanaduCLI do:
+`g++ XVDTypes.cpp XanaduXVD.cpp XanaduCLI.cpp`
+
+At the moment this should build everywhere, on Windows (cygwin works great), Linux and MacOS.
+
+# Contribute
+Any contributions and [Pull Requests](https://github.com/xboxoneresearch/XanaduXVD/pulls) are welcome, just remember, any code you want merged into the repo should be extensively commented or have accompanying documentation! You may want to check the [Open Issues](https://github.com/xboxoneresearch/XanaduXVD/pulls) for inspiration
+
+# Acknowledgements
+Tremendous thanks to tuxuser and msixvc for the technical help and also assisting during my late-night rants about the most (in)significant details about XVD files.
