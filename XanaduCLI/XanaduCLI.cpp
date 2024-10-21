@@ -94,7 +94,6 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    
     // Create XanaduXVD object
     XanaduXVD xvd(filename);
 
@@ -108,8 +107,11 @@ int main(int argc, char *argv[])
     if(infodump)
         xvd.InfoDump();
 
-    // go laugh have fun
-    //xvd.ExtractEmbeddedXVD("exvd.xvd");
+    if(extract_exvd)
+        xvd.ExtractEmbeddedXVD("exvd.xvd"); // TODO: pass argument
+
+    if(extract_udat)
+        xvd.ExtractUserData("extracted.vbi"); // TODO: pass argument
 
     // TODO Create enum of errors in XanaduXVD.h
     return 0;

@@ -744,15 +744,10 @@ uint64_t XanaduXVD::FindDriveSize()
 uint64_t XanaduXVD::ComputeUsedDriveSizeInDynamicXVD()
 {
     uint64_t ocupancy = FindDynamicOccupancy();
-    /*
-    printf("dynamic occupancy: %llu\n", ocupancy);
-    printf("user_data_size:    %d\n", mHeader.user_data_length);
-    printf("xcv_infor_size:    %d\n", mHeader.xvc_data_length);
-    printf("dyn_header_len:    %d\n", mHeader.dynamic_header_length);
-    printf("drive_size:        %llu\n", mHeader.drive_size);
-    printf("---------------------------\n");
-    */
 
+    // This might seem like a random computation, but if you draw it it's very easy.
+    // It all comes together once you remember that the mHeader.drive_size is not the actual occupancy of the disk,
+    // but the maximum size that it can take.
     auto unused_drive_space = (mHeader.drive_size + mHeader.user_data_length + mHeader.xvc_data_length + mHeader.dynamic_header_length) - ocupancy;
     auto used_drive_space = mHeader.drive_size - unused_drive_space;
 
@@ -764,6 +759,37 @@ uint64_t XanaduXVD::ComputeUsedDriveSizeInDynamicXVD()
 
 uint64_t XanaduXVD::FindDynamicOccupancy()
 {
+    /******************************************************************************************\
+                                        BAT THEORY OF OPERATION
+
+    BAT (Block Allocation Table) - also called Dynamic Header in XVDs - is a concept borrowed
+    from the VHD (Virtual Hard Disk) fileformat. The BAT is simply a table that contains entries.
+    Entries can either be unallocated (their value is 0xFFFFFFFF) or they can be allocated, in
+    which case their value is an offset. This offset is an indirection that "maps" blocks.
+    
+    The mapping is a mapping from the Drive's POV into the XVD file in disk (improve this theory)
+
+    This function FindDynamicOccupancy() is very simple. It finds and reads the BAT, and then
+    iterates through all the entries, counting how many of them are allocated. Each entry is
+    the representation of a block. If there are N valid entries, this is equivalent to saying
+    the XVD file has at least N blocks of data that are in use. Or in other words, at least
+    N * sizeof(block) bytes are used.
+
+    Remark 1: For some reason, the BAT covers not only the Drive, but also UserData, XVC, and
+              the BAT itself. UserData and XVC shouldn't grow so this is weird, and makes the
+              explanation a little bit more difficult to understand. It is not clear for me atm
+              how an hypervisor treats a mounted XVD's UserData and XVC regions. Those should in
+              theory not be visible for a guestOS. Only the Drive should be "seen" by a guestOS.
+              UserData is often the VBI bootloader for an Xbox VM, which iirc gets loaded into
+              RAM memory. That somewhat matches my expectations, that UserData is not really ever
+              accessed trough the guestOS filesystem (since it's loaded in RAM) so it being in the
+              BAT feels out of place.
+
+    Remark 2: Block size is always 0xAA000, although the XVD header has a field to override
+              this value, but no other values have yet been found in the wild AFAIK.
+
+    \*******************************************************************************************/
+
     // 1. Find the BAT offset. This is now possible since we know the sizes of all previous regions (especially the HashTree)
     //     HashTree comes always after MDU and then we have user data, XVC, and finally we'd reach the BAT start offset.
     auto bat_start = FindHashTreePosition() + FindHashTreeSize() + 
@@ -813,7 +839,6 @@ uint64_t XanaduXVD::FindDynamicOccupancy()
     // I have not figured exactly why I have to add +1 to the number of BAT entries unfortunately. 
     // The count of allocated entries is correct, so the +1 shouldn't be needed, but it is.
     return (allocated_entries+1) * XVD_BLOCK_SIZE;
-    //return max_entry;
 }
 
 //////////////////////////////////////////
@@ -846,7 +871,6 @@ int XanaduXVD::InfoDump()
     printf("///////////////////////////// XVD INFORMATION /////////////////////////////\n\n");
     for(auto value : values)
     {
-        // Todo: print aligned
         printf("%-18s : %s\n", value.first.c_str(), value.second.c_str());
     }
     printf("\n///////////////////////////// XVD INFORMATION /////////////////////////////\n");
