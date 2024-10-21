@@ -1,0 +1,20 @@
+name: Windows Build CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    # The windows-latest runner on GitHub Actions comes with g++ (from MSYS2) pre-installed, so no extra setup should be required unless your project needs specific libraries or configurations.
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: G++ build (Windows)
+      run: g++ -I.\\src\\ .\\XanaduCLI\\XanaduCLI.cpp .\\src\\XanaduXVD.cpp .\\src\\XVDTypes.cpp -o XanaduCLI.exe
+
+
+          

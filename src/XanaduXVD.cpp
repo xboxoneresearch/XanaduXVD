@@ -885,7 +885,7 @@ int XanaduXVD::ExtractEmbeddedXVD(const char* output_filename)
     auto exvd_pos  = FindEmbeddedXVDPosition();
     if(exvd_size == 0)
     {
-        fprintf(stderr, "ERR: XVD does not contain an eXVD.\n", output_filename);
+        fprintf(stderr, "ERR: XVD does not contain an eXVD.\n");
         return 1;
     }
 
@@ -923,7 +923,7 @@ int XanaduXVD::ExtractUserData(const char* output_filename)
     auto userdata_pos  = FindUserDataPosition();
     if(userdata_size == 0)
     {
-        fprintf(stderr, "ERR: XVD does not contain UserData.\n", output_filename);
+        fprintf(stderr, "ERR: XVD does not contain UserData.\n");
         return 1;
     }
 

@@ -7,7 +7,7 @@
 ///////////////////////////////////////
 // Project includes
 ///////////////////////////////////////
-#include "..\src\XanaduXVD.h"
+#include "XanaduXVD.h"
 #include <getopt.h>
 
 void PrintHelp()
