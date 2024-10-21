@@ -1,0 +1,1 @@
+g++ .\XanaduCLI\XanaduCLI.cpp .\src\XanaduXVD.cpp .\src\XVDTypes.cpp
