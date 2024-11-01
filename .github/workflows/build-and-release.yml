@@ -7,9 +7,26 @@ on:
   workflow_dispatch:  # Allow manual runs if needed
 
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: "Release ${{ github.ref_name }}"
+        draft: false
+        prerelease: false
+
   build-and-release:
+    needs: create-release  # Ensure the release is created before this job runs
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.os == 'macos-latest' }}  # Continue on error only for macOS
+    continue-on-error: ${{ matrix.os == 'macos-latest' }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -29,25 +46,12 @@ jobs:
         g++ -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
       shell: bash  # Ensures compatibility on all platforms
 
-    - name: Create GitHub Release
-      id: create_release
-      if: ${{ matrix.os == 'ubuntu-latest' }}  # Only create the release once (on one OS)
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref_name }}
-        release_name: "Release ${{ github.ref_name }}"
-        draft: false
-        prerelease: false
-
     - name: Upload Release Asset
-      if: ${{ steps.create_release.outputs.upload_url != '' }}  # Only upload if the release was created
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
         asset_path: XanaduCLI${{ matrix.extension }}
         asset_name: XanaduCLI-${{ matrix.os }}${{ matrix.extension }}
         asset_content_type: application/octet-stream
