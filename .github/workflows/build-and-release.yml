@@ -45,9 +45,8 @@ jobs:
 
     # Build step - uses appropriate compiler based on OS
     - name: Build Project (Windows)
-      shell: bash
       if: ${{ matrix.compiler == 'mingw-g++' }}
-      run: ${{ steps.msys2.outputs.msys2-location }}/mingw64/bin/g++ -static -std=c++2a -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
+      run: ${{ steps.msys2.outputs.msys2-location }}\mingw64\bin\g++ -static -std=c++2a -I.\src .\XanaduCLI\XanaduCLI.cpp .\src\XanaduXVD.cpp .\src\XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
 
     - name: Build Project (Windows)
       shell: bash
