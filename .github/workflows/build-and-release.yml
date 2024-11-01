@@ -13,14 +13,17 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            extension: .out
             compiler: g++
+            build-args: -static
           - os: windows-latest
             extension: .exe
-            compiler: mingw-g++
+            compiler: D:/a/_temp/msys64/mingw64/bin/g++
+            build-args: -static
           - os: macos-latest
-            extension: .out
             compiler: clang++
+            # MacOS cannot build fully static
+            # reference: https://stackoverflow.com/questions/5259249/creating-static-mac-os-x-c-build
+            build-args: -static-libgcc -static-libstdc++
 
     steps:
     - uses: actions/checkout@v4
@@ -35,20 +38,12 @@ jobs:
         update: true
         install: mingw-w64-x86_64-gcc
 
-    # Add MinGW to PATH on Windows
-    - name: Add MinGW to PATH
-      if: ${{ matrix.os == 'windows-latest' }}
-      run: |
-        echo "${{ steps.msys2.outputs.msys2-location }}/mingw64/bin"
-        echo "${{ steps.msys2.outputs.msys2-location }}/mingw64/bin" >> $GITHUB_PATH
+    # Build step - uses appropriate compiler and args based on OS
+    - name: Build Project
       shell: bash
+      run: ${{ matrix.compiler }} ${{ matrix.build-args }} -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
 
-    # Build step - uses appropriate compiler based on OS
-    - name: Build Project (Windows)
-      if: ${{ matrix.compiler == 'mingw-g++' }}
-      run: ${{ steps.msys2.outputs.msys2-location }}\mingw64\bin\g++ -static -std=c++2a -I.\src .\XanaduCLI\XanaduCLI.cpp .\src\XanaduXVD.cpp .\src\XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
-
-    - name: Build Project (Windows)
-      shell: bash
-      if: ${{ matrix.compiler != 'mingw-g++' }}
-      run: ${{ matrix.compiler }} -static -std=c++2a -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
+    - uses: actions/upload-artifact@v4
+      with:
+        name: Executable (${{ matrix.os }})
+        path: XanaduCLI${{ matrix.extension }}
