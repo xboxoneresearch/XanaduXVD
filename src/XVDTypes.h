@@ -317,7 +317,7 @@ struct XvdHeader
     // Note: seems like some bits are used in modern XVDs, but for unknown purposes
     uint8_t         reserved[XvdHeader_RESERVED];
 
-} __attribute__ ((gcc_struct, __packed__));
+} __attribute__ ((__packed__));
 
 struct GUID 
 {          
