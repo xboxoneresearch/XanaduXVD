@@ -54,4 +54,3 @@ jobs:
         else
           ${{ matrix.compiler }} -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
         fi
-      shell: bash
