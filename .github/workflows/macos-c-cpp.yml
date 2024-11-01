@@ -1,0 +1,16 @@
+name: MacOS Build CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: macos-latest  # Use macOS runner
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: G++ build (Windows)
+      run: g++ -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI.out
