@@ -20,16 +20,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # Set up MSYS2 environment and install MinGW on Windows
-    - name: Set up MSYS2 with MinGW
-      id: msys2
-      if: ${{ matrix.os == 'windows-latest' }}
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: MINGW64
-        update: true
-        install: mingw-w64-x86_64-gcc
-
     # Build step - uses appropriate compiler and args based on OS
     - name: Build Project
       run: |
