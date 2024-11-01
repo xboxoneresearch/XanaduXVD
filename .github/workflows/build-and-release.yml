@@ -20,7 +20,7 @@ jobs:
             compiler: D:/a/_temp/msys64/mingw64/bin/g++
             build-args: -static
           - os: macos-latest
-            compiler: clang++
+            compiler: g++
             # MacOS cannot build fully static
             # reference: https://stackoverflow.com/questions/5259249/creating-static-mac-os-x-c-build
             build-args: -static-libgcc -static-libstdc++
