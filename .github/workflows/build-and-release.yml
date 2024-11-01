@@ -17,7 +17,7 @@ jobs:
             build-args: -static
           - os: windows-latest
             extension: .exe
-            compiler: /mingw64/bin/g++
+            compiler: D:\a\_temp\msys64\mingw64\bin\g++
             build-args: -static
           - os: macos-latest
             compiler: g++
@@ -38,14 +38,8 @@ jobs:
         update: true
         install: mingw-w64-x86_64-gcc
 
-    - name: Build Project
-      if: ${{ matrix.os == 'windows-latest' }}
-      shell: bash
-      run: ls /mingw64/bin/
-
     # Build step - uses appropriate compiler and args based on OS
     - name: Build Project
-      shell: bash
       run: |
         mkdir output/
         ${{ matrix.compiler }} ${{ matrix.build-args }} -std=c++2a -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o output/XanaduCLI${{ matrix.extension }}
