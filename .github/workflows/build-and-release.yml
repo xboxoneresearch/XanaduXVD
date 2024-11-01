@@ -13,17 +13,9 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            compiler: g++
-            build-args: -static
           - os: windows-latest
             extension: .exe
-            compiler: D:\a\_temp\msys64\mingw64\bin\g++
-            build-args: -static
           - os: macos-latest
-            compiler: g++
-            # MacOS cannot build fully static
-            # reference: https://stackoverflow.com/questions/5259249/creating-static-mac-os-x-c-build
-            build-args:
 
     steps:
     - uses: actions/checkout@v4
@@ -41,10 +33,12 @@ jobs:
     # Build step - uses appropriate compiler and args based on OS
     - name: Build Project
       run: |
-        mkdir output/
-        ${{ matrix.compiler }} ${{ matrix.build-args }} -std=c++2a -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o output/XanaduCLI${{ matrix.extension }}
+       mkdir build
+       cd build
+       cmake ..
+       make
 
     - uses: actions/upload-artifact@v4
       with:
         name: Executable (${{ matrix.os }})
-        path: output/XanaduCLI${{ matrix.extension }}
+        path: build/XanaduCLI${{ matrix.extension }}
