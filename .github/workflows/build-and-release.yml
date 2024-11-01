@@ -29,12 +29,12 @@ jobs:
     continue-on-error: ${{ matrix.os == 'macos-latest' }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-2019, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
             extension: .out
             compiler: g++
-          - os: windows-2019
+          - os: windows-latest
             extension: .exe
             compiler: mingw-g++
           - os: macos-latest
@@ -46,7 +46,7 @@ jobs:
 
     # Set up MSYS2 environment and install MinGW on Windows
     - name: Set up MSYS2 with MinGW
-      if: ${{ matrix.os == 'windows-2019' }}
+      if: ${{ matrix.os == 'windows-latest' }}
       uses: msys2/setup-msys2@v2
       with:
         msystem: MINGW64
@@ -55,7 +55,7 @@ jobs:
 
     # Add MinGW to PATH on Windows
     - name: Add MinGW to PATH
-      if: ${{ matrix.os == 'windows-2019' }}
+      if: ${{ matrix.os == 'windows-latest' }}
       run: echo "C:/msys64/mingw64/bin" >> $GITHUB_PATH
 
     # Build step - uses appropriate compiler based on OS
