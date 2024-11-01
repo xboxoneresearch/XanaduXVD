@@ -44,24 +44,25 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # Conditional MinGW setup for Windows
-    - name: Set up MSYS2 and install MinGW
+    # Set up MSYS2 environment and install MinGW on Windows
+    - name: Set up MSYS2 with MinGW
       if: ${{ matrix.os == 'windows-latest' }}
-      run: |
-        pacman -Sy --noconfirm
-        pacman -S --noconfirm mingw-w64-x86_64-gcc
-      shell: bash
+      uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: mingw-w64-x86_64-gcc
 
     # Build step - uses appropriate compiler based on OS
     - name: Build Project
       run: |
         if [ "${{ matrix.compiler }}" == "mingw-g++" ]; then
-          /mingw64/bin/g++ -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
+          mingw64/bin/g++ -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
         else
           ${{ matrix.compiler }} -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
         fi
       shell: bash
 
+    # Upload Release Asset for each OS build
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
