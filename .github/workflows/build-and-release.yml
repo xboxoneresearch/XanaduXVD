@@ -61,7 +61,7 @@ jobs:
     - name: Build Project
       run: |
         if [ "${{ matrix.compiler }}" == "mingw-g++" ]; then
-          g++ -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
+          g++ -std=c++17 -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
         else
           ${{ matrix.compiler }} -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
         fi
