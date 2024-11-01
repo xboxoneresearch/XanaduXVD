@@ -9,6 +9,7 @@ on:
 jobs:
   build-and-release:
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.os == 'macos-latest' }}  # Continue on error only for macOS
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -30,6 +31,7 @@ jobs:
 
     - name: Create GitHub Release
       id: create_release
+      if: ${{ matrix.os == 'ubuntu-latest' }}  # Only create the release once (on one OS)
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,6 +42,7 @@ jobs:
         prerelease: false
 
     - name: Upload Release Asset
+      if: ${{ steps.create_release.outputs.upload_url != '' }}  # Only upload if the release was created
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
