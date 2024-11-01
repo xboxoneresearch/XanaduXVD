@@ -51,5 +51,5 @@ jobs:
 
     - name: Build Project (Windows)
       shell: bash
-      if: ${{ matrix.compiler == 'mingw-g++' }}
+      if: ${{ matrix.compiler != 'mingw-g++' }}
       run: ${{ matrix.compiler }} -static -std=c++2a -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
