@@ -24,7 +24,7 @@ jobs:
         prerelease: false
 
   build-and-release:
-    needs: create-release  # Ensure the release is created before this job runs
+    needs: create-release
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.os == 'macos-latest' }}
     strategy:
@@ -33,18 +33,34 @@ jobs:
         include:
           - os: ubuntu-latest
             extension: .out
+            compiler: g++
           - os: windows-latest
             extension: .exe
+            compiler: mingw-g++
           - os: macos-latest
             extension: .out
+            compiler: clang++
 
     steps:
     - uses: actions/checkout@v4
 
+    # Conditional MinGW setup for Windows
+    - name: Set up MSYS2 and install MinGW
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: |
+        pacman -Sy --noconfirm
+        pacman -S --noconfirm mingw-w64-x86_64-gcc
+      shell: bash
+
+    # Build step - uses appropriate compiler based on OS
     - name: Build Project
       run: |
-        g++ -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
-      shell: bash  # Ensures compatibility on all platforms
+        if [ "${{ matrix.compiler }}" == "mingw-g++" ]; then
+          /mingw64/bin/g++ -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
+        else
+          ${{ matrix.compiler }} -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
+        fi
+      shell: bash
 
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
