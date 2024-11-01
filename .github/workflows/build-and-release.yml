@@ -54,14 +54,3 @@ jobs:
           ${{ matrix.compiler }} -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
         fi
       shell: bash
-
-    # Upload Release Asset for each OS build
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: XanaduCLI${{ matrix.extension }}
-        asset_name: XanaduCLI-${{ matrix.os }}${{ matrix.extension }}
-        asset_content_type: application/octet-stream
