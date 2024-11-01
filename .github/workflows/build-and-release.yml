@@ -17,7 +17,7 @@ jobs:
             build-args: -static
           - os: windows-latest
             extension: .exe
-            compiler: /d/a/_temp/msys64/mingw64/bin/g++
+            compiler: /mingw64/bin/g++
             build-args: -static
           - os: macos-latest
             compiler: g++
@@ -41,7 +41,7 @@ jobs:
     - name: Build Project
       if: ${{ matrix.os == 'windows-latest' }}
       shell: bash
-      run: ls /
+      run: ls /mingw64/bin/
 
     # Build step - uses appropriate compiler and args based on OS
     - name: Build Project
