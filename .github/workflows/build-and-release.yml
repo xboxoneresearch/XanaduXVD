@@ -36,7 +36,7 @@ jobs:
        mkdir build
        cd build
        cmake ..
-       make
+       cmake --build .
 
     - uses: actions/upload-artifact@v4
       with:
