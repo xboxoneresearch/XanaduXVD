@@ -43,7 +43,7 @@ jobs:
       shell: bash
       run: |
         mkdir output/
-        ${{ matrix.compiler }} ${{ matrix.build-args }} -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o output/XanaduCLI${{ matrix.extension }}
+        ${{ matrix.compiler }} ${{ matrix.build-args }} -std=c++2a -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o output/XanaduCLI${{ matrix.extension }}
 
     - uses: actions/upload-artifact@v4
       with:
