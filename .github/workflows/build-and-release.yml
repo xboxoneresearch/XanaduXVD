@@ -38,6 +38,11 @@ jobs:
         update: true
         install: mingw-w64-x86_64-gcc
 
+    - name: Build Project
+      if: ${{ matrix.os == 'windows-latest' }}
+      shell: bash
+      run: ls /
+
     # Build step - uses appropriate compiler and args based on OS
     - name: Build Project
       shell: bash
