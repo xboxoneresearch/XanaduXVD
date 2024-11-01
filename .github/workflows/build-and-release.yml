@@ -41,16 +41,10 @@ jobs:
     - name: Add MinGW to PATH
       if: ${{ matrix.os == 'windows-latest' }}
       run: echo "${{ steps.msys2.outputs.msys2-location }}\mingw64\bin" >> $GITHUB_PATH
-
-    - name: Tree
-      if: ${{ matrix.os == 'windows-latest' }}
-      run: tree ${{ steps.msys2.outputs.msys2-location }}
+      shell: bash
 
     # Build step - uses appropriate compiler based on OS
-    - name: Build Project
-      run: |
-        if [ "${{ matrix.compiler }}" == "mingw-g++" ]; then
-          ${{ steps.msys2.outputs.msys2-location }}\mingw64\bin\g++ -static -std=c++2a -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
-        else
-          ${{ matrix.compiler }} -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
-        fi
+    - name: Build Project (Windows)
+      shell: bash
+      if: "{{ matrix.compiler == 'mingw-g++' }}"
+      run: ${{ steps.msys2.outputs.msys2-location }}/mingw64/bin/g++ -static -std=c++2a -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
