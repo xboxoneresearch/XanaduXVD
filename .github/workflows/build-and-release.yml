@@ -2,8 +2,6 @@ name: C/C++ CI and Release
 
 on:
   push:
-    tags:
-      - 'v*.*.*'  # Trigger only on tags like v1.0.0
   workflow_dispatch:  # Allow manual runs if needed
 
 jobs:
@@ -57,6 +55,9 @@ jobs:
     - name: Add MinGW to PATH
       if: ${{ matrix.os == 'windows-latest' }}
       run: echo "C:/msys64/mingw64/bin" >> $GITHUB_PATH
+
+    - name: Tree
+      run: tree C:\msys64\mingw64\bin
 
     # Build step - uses appropriate compiler based on OS
     - name: Build Project
