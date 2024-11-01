@@ -23,7 +23,7 @@ jobs:
             compiler: g++
             # MacOS cannot build fully static
             # reference: https://stackoverflow.com/questions/5259249/creating-static-mac-os-x-c-build
-            build-args: -static-libgcc -static-libstdc++
+            build-args:
 
     steps:
     - uses: actions/checkout@v4
@@ -41,9 +41,11 @@ jobs:
     # Build step - uses appropriate compiler and args based on OS
     - name: Build Project
       shell: bash
-      run: ${{ matrix.compiler }} ${{ matrix.build-args }} -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
+      run: |
+        mkdir output/
+        ${{ matrix.compiler }} ${{ matrix.build-args }} -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o output/XanaduCLI${{ matrix.extension }}
 
     - uses: actions/upload-artifact@v4
       with:
         name: Executable (${{ matrix.os }})
-        path: XanaduCLI${{ matrix.extension }}
+        path: output/XanaduCLI${{ matrix.extension }}
