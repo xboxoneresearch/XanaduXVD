@@ -1,3 +1,7 @@
 # Ignore files with extension `.class` & `.exe`
 *.class
 *.exe
+
+build/
+cmake_install.cmake
+Makefile
