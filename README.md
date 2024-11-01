@@ -2,6 +2,7 @@
 
 ![Build Ubuntu](https://github.com/xboxoneresearch/XanaduXVD/actions/workflows/c-cpp.yml/badge.svg)
 ![Build Windows](https://github.com/xboxoneresearch/XanaduXVD/actions/workflows/cygwin-c-cpp.yml/badge.svg)
+![Build MacOS](https://github.com/xboxoneresearch/XanaduXVD/actions/workflows/macos-c-cpp.yml/badge.svg)
 
 XanaduXVD is an experimental C++ tool/playground for parsing and manipulating XVD (Xbox Virtual Disk) files, used by Xbox One, Xbox Series, and Windows PC. It aims to serve as a source of technical documentation for the fileformat, since it lacks a public standard.
 
