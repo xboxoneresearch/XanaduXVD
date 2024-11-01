@@ -17,7 +17,7 @@ jobs:
             build-args: -static
           - os: windows-latest
             extension: .exe
-            compiler: D:/a/_temp/msys64/mingw64/bin/g++
+            compiler: /d/a/_temp/msys64/mingw64/bin/g++
             build-args: -static
           - os: macos-latest
             compiler: g++
