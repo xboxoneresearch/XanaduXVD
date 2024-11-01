@@ -52,11 +52,16 @@ jobs:
         update: true
         install: mingw-w64-x86_64-gcc
 
+    # Add MinGW to PATH on Windows
+    - name: Add MinGW to PATH
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: echo "C:/msys64/mingw64/bin" >> $GITHUB_PATH
+
     # Build step - uses appropriate compiler based on OS
     - name: Build Project
       run: |
         if [ "${{ matrix.compiler }}" == "mingw-g++" ]; then
-          mingw64/bin/g++ -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
+          g++ -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
         else
           ${{ matrix.compiler }} -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI${{ matrix.extension }}
         fi
