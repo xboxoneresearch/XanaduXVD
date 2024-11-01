@@ -12,5 +12,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: G++ build (Windows)
+    - name: G++ build (MacOS)
       run: g++ -I./src ./XanaduCLI/XanaduCLI.cpp ./src/XanaduXVD.cpp ./src/XVDTypes.cpp -o XanaduCLI.out
