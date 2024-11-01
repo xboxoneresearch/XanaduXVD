@@ -29,6 +29,7 @@ jobs:
 
     # Set up MSYS2 environment and install MinGW on Windows
     - name: Set up MSYS2 with MinGW
+      id: msys2
       if: ${{ matrix.os == 'windows-latest' }}
       uses: msys2/setup-msys2@v2
       with:
@@ -39,11 +40,11 @@ jobs:
     # Add MinGW to PATH on Windows
     - name: Add MinGW to PATH
       if: ${{ matrix.os == 'windows-latest' }}
-      run: echo "C:/msys64/mingw64/bin" >> $GITHUB_PATH
+      run: echo "${{ steps.msys2.outputs.msys2-location }}\bin" >> $GITHUB_PATH
 
     - name: Tree
       if: ${{ matrix.os == 'windows-latest' }}
-      run: tree C:\msys64\mingw64\bin
+      run: tree ${{ steps.msys2.outputs.msys2-location }}
 
     # Build step - uses appropriate compiler based on OS
     - name: Build Project
