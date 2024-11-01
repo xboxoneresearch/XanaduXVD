@@ -2,8 +2,6 @@ name: C/C++ CI and Release
 
 on:
   push:
-    tags:
-      - 'v*.*.*'  # Trigger only on tags like v1.0.0
   workflow_dispatch:  # Allow manual runs if needed
 
 jobs:
