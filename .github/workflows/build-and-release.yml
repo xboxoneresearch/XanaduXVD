@@ -49,9 +49,9 @@ jobs:
       if: ${{ matrix.os == 'windows-2019' }}
       uses: msys2/setup-msys2@v2
       with:
-        msystem: UCRT64
+        msystem: MINGW64
         update: true
-        install: mingw-w64-ucrt-x86_64-gcc
+        install: mingw-w64-x86_64-gcc
 
     # Add MinGW to PATH on Windows
     - name: Add MinGW to PATH
