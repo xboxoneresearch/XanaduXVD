@@ -216,6 +216,8 @@ enum XvdType
 ///////////////////////////////////////
 // Type definitions
 ///////////////////////////////////////
+#pragma pack(push,1)
+
 struct XvdHeader
 {
     uint8_t         rsa_signature[RSA_SINGATURE_SIZE];   // 0x000
@@ -317,7 +319,9 @@ struct XvdHeader
     // Note: seems like some bits are used in modern XVDs, but for unknown purposes
     uint8_t         reserved[XvdHeader_RESERVED];
 
-} __attribute__ ((__packed__));
+};
+
+#pragma pack(pop)
 
 struct GUID 
 {          
