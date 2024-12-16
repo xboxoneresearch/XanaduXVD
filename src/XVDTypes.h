@@ -319,7 +319,7 @@ struct XvdHeader
 
 } __attribute__ ((gcc_struct, __packed__));
 
-struct GUID 
+struct MS_GUID 
 {          
     uint32_t Data1;
     uint16_t Data2;
@@ -340,6 +340,6 @@ uint64_t PagesToBlocks(uint32_t num_pages);
 uint64_t AlignSizeToPageBoundary(uint64_t size_bytes);
 
 // Microsoft formats conversion methods
-std::string MsGUIDToString(GUID guid);
+std::string MsGUIDToString(MS_GUID guid);
 std::string MsVersionToString(uint64_t version, bool extended);
 std::string FiletimeToString(uint64_t filetime);

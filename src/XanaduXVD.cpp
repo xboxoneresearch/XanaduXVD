@@ -11,6 +11,10 @@
 ///////////////////////////////////////
 #include "XanaduXVD.h"
 
+///////////////////////////////////////
+// Windows includes (replace with wine later)
+///////////////////////////////////////
+#include <Windows.h>
 
 // FIXME: Where does the PLS section fit in the schemes below???
 
@@ -440,7 +444,16 @@ uint64_t XanaduXVD::HashTreeSizeFromPageNum(uint64_t num_pages_to_hash, bool res
     // something like this... 
     /*
 
-L0      [h0]          [h1]  ...    [h169]  
+    DATA
+    PAGES             ---
+
+    L0                ...
+
+    L1                ...
+
+    L2                ...
+
+    L3  [h0]          [h1]  ...    [h169]  
           \            |            /
            \           |           /
             \          |          /
@@ -453,7 +466,7 @@ L0      [h0]          [h1]  ...    [h169]
                    \   |   /
                     \  |  /
                      \ | /
-R                 [ROOT HASH]
+    R             [ROOT HASH]
 
         
     */
@@ -515,10 +528,7 @@ R                 [ROOT HASH]
     // The actual level occupancy discourse above is just a curiosity. Here's the logic:
     
 
-
-
     // NEW EXPLAINATION BELOW
-
     /******************************************************************************************\
                                 XVD HashTree THEORY OF OPERATION
 
@@ -545,7 +555,7 @@ R                 [ROOT HASH]
 
     Level 3: contains hashes of the pages of level 2, grouped in sets of up to 170 pages.
 
-    ROOT HASH: Generated from the latest level existing, which can only be a page in size.
+    ROOT HASH: Generated from the latest level existing (which can only be a page in size).
 
     170 (0xAA) is the magic number that ensures that a lot of data can be hashed while
     never needing more than 4 levels. The math above tells us it's enough to ensure
@@ -852,12 +862,12 @@ int XanaduXVD::InfoDump()
 
     // Parse relevant header info in a user-friendly format
     // TODO: Compiler warning is legit, suppress it eventually
-    values["CONTENT_ID"] = MsGUIDToString(*(GUID*)mHeader.content_id_guid); // Incredibly illegal casts FTW
-    values["USER_ID"] = MsGUIDToString(*(GUID*)mHeader.user_id);
+    values["CONTENT_ID"] = MsGUIDToString(*(MS_GUID*)mHeader.content_id_guid); // Incredibly illegal casts FTW
+    values["USER_ID"] = MsGUIDToString(*(MS_GUID*)mHeader.user_id);
     values["VERSION"] = std::to_string(mHeader.format_version);
     values["SANDBOX"] = std::string((char*)mHeader.sandbox_id);
-    values["ProductID"] = MsGUIDToString(*(GUID*)mHeader.ProductId);
-    values["PDUID"] = MsGUIDToString(*(GUID*)mHeader.PDUID);
+    values["ProductID"] = MsGUIDToString(*(MS_GUID*)mHeader.ProductId);
+    values["PDUID"] = MsGUIDToString(*(MS_GUID*)mHeader.PDUID);
     values["PackageVersion"] = MsVersionToString(mHeader.PackageVersionNumber, false);
     values["MinSysVersion"] = MsVersionToString(mHeader.min_sp_ver, false);
     values["CreationTime"] = FiletimeToString(mHeader.creation_time);
@@ -885,7 +895,7 @@ int XanaduXVD::ExtractEmbeddedXVD(const char* output_filename)
     auto exvd_pos  = FindEmbeddedXVDPosition();
     if(exvd_size == 0)
     {
-        fprintf(stderr, "ERR: XVD does not contain an eXVD.\n", output_filename);
+        fprintf(stderr, "ERR: XVD does not contain an eXVD.\n");
         return 1;
     }
 
@@ -923,7 +933,7 @@ int XanaduXVD::ExtractUserData(const char* output_filename)
     auto userdata_pos  = FindUserDataPosition();
     if(userdata_size == 0)
     {
-        fprintf(stderr, "ERR: XVD does not contain UserData.\n", output_filename);
+        fprintf(stderr, "ERR: XVD does not contain UserData.\n");
         return 1;
     }
 

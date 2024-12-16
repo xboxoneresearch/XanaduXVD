@@ -58,7 +58,7 @@ uint64_t AlignSizeToPageBoundary(uint64_t size_bytes)
         return size_bytes;
 }
 
-std::string MsGUIDToString(GUID guid)
+std::string MsGUIDToString(MS_GUID guid)
 {
     char buffer[100];
     sprintf(buffer, "%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX",
