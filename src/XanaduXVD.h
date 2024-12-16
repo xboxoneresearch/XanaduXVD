@@ -27,6 +27,7 @@
 #include <filesystem>
 #include <cmath>
 #include <map>
+#include <bit> // for endianess shenanigans
 
 class XanaduXVD
 {
@@ -47,6 +48,12 @@ private:
         INVALID_HEADER   = 3,
         INVALID_SIZE     = 4
     };
+
+///////////////////////////////////////
+// INTERNAL AUXILIARY METHODS        //
+///////////////////////////////////////
+private:
+    void    FixHeaderEndianess(XvdHeader* xvd_header);
 
 ///////////////////////////////////////
 // INTERNAL XVD MANIPULATION METHODS //
@@ -82,6 +89,7 @@ public:
     int ExtractUserData(const char* output_filename);
     int VerifyHashTree();
     int RebuildHashTree();
+    int VerifySignature();
 
 ///////////////////////////////////////
 // CLASS ATTRIBUTES                  //

@@ -6,6 +6,9 @@
 /*                                                        */
 /**********************************************************/
 
+// Suppress specific warnings from the XVD header struct define
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+
 ///////////////////////////////////////
 // Project includes
 ///////////////////////////////////////
@@ -14,7 +17,7 @@
 ///////////////////////////////////////
 // Windows includes (replace with wine later)
 ///////////////////////////////////////
-#include <Windows.h>
+//#include <Windows.h>
 
 // FIXME: Where does the PLS section fit in the schemes below???
 
@@ -113,7 +116,15 @@ int XanaduXVD::Start(bool unsafe_mode, bool debug_mode)
     fread(buffer, 1, XVD_HEADER_INCL_SIGNATURE, mFD);
 
     // Cast the buffer to the header struct
-    const XvdHeader *xvd=(const struct XvdHeader *)buffer;
+    XvdHeader* xvd = (struct XvdHeader*)buffer;
+
+    // NOTE: Direct de-serialization works on big endian machines only. To support modern Windows ARM PCs,
+    // other ARM devices, and M1/M2/M3/M4 Macs, detect if the endianess of the system
+    // is little, and call an auxiliary method to fix the memory representation:
+    if constexpr(std::endian::native == std::endian::little)
+    {
+        FixHeaderEndianess(xvd);
+    } // else TODO: should we check for std::endian::mixed instead of assuming big just in case?
 
     // Copy into our object's memory
     mHeader = *xvd;
@@ -139,6 +150,59 @@ int XanaduXVD::Stop()
 
     // free(buffer)s
     return 0;
+}
+
+void XanaduXVD::FixHeaderEndianess(XvdHeader* xvd_header)
+{
+    // TODO here be dragons
+    /*
+    uint8_t         rsa_signature[RSA_SINGATURE_SIZE];   // 0x000
+    uint8_t         magic[8];                            // 0x200
+    XvdFlags        flags;                               // 0x208
+    uint32_t        format_version;                      // 0x20C
+    uint64_t        creation_time;                       // 0x210
+    uint64_t        drive_size;                          // 0x218
+    uint8_t         content_id_guid[0x10];               // 0x220 DRIVE id
+    uint8_t         user_id[0x10];                       // 0x230 User  id
+    uint8_t         root_hash[0x20];                     // 0x240
+    uint8_t         xvc_hash[0x20];                      // 0x260
+    uint32_t        xvd_type;                            // 0x280
+    XvdContentType  content_type;                        // 0x284
+    uint32_t        embedded_xvd_length;                 // 0x288
+    uint32_t        user_data_length;                    // 0x28C
+    uint32_t        xvc_data_length;                     // 0x290
+    uint32_t        dynamic_header_length;               // 0x294
+    uint32_t        block_size;                          // 0x298
+    XvdExtEntry     ExtEntry[4];
+    uint16_t        Capabilities[8]; 
+    uint8_t         PECatalogHash[ROOT_HASH_LENGTH];
+    uint8_t         exvd_PDUID[16];
+    uint8_t         reserved_0[16];
+    uint8_t         key_material[XVD_KEY_LEN];
+    uint8_t         user_data_hash[ROOT_HASH_LENGTH];
+    uint8_t         sandbox_id[XVD_SANDBOX_ID_LENGTH];
+    uint8_t         ProductId[16];
+    uint8_t         PDUID[16];
+    uint64_t        PackageVersionNumber;
+    uint16_t        PECatalogCaps[XVD_MAX_PE_CATALOGS][XVD_MAX_PE_CATALOG_CAPS];
+    uint8_t         PECatalogs[XVD_MAX_PE_CATALOGS][ROOT_HASH_LENGTH];
+    uint32_t        writeable_expiration_date;
+    uint32_t        writeable_policy_flags;
+    uint32_t        pls_size;         
+    uint8_t         mutable_page_num; 
+    XvdPlatformMask platforms_supported;
+    uint32_t        max_pls_size; 
+    uint8_t         server_console_mode;
+    uint8_t         unused[13]; 
+    uint64_t        remote_blob_size;
+    int64_t         sequence_number;
+    uint64_t        min_sp_ver;
+    uint32_t        odk_id;
+    uint8_t         roaming_header[ROAMING_DATA_SIZE];
+    XvdTrimState    trim_state;
+
+    uint8_t         reserved[XvdHeader_RESERVED];
+    */
 }
 
 bool XanaduXVD::IsValidHeader()
@@ -175,7 +239,7 @@ bool XanaduXVD::IsValidHeader()
     // At the moment, XanaduXVD only supports v2 and v3, other versions have not been found in the wild
     if(mHeader.format_version != 3)
     {
-        printf("Rare XVD Format Version found: %d\n", mHeader.format_version);
+        printf("Rare XVD Format Version found: v %d\n", mHeader.format_version);
         if(mHeader.format_version != 2)
             return false;
     }
@@ -967,6 +1031,11 @@ int XanaduXVD::VerifyHashTree()
 }
 
 int XanaduXVD::RebuildHashTree()
+{
+    return 0;
+}
+
+int XanaduXVD::VerifySignature()
 {
     return 0;
 }
