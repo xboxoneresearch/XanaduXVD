@@ -915,6 +915,112 @@ uint64_t XanaduXVD::FindDynamicOccupancy()
     return (allocated_entries+1) * XVD_BLOCK_SIZE;
 }
 
+// Change this function to ComputeSignature(....., key)
+int VerifySignature(const unsigned char* digest, size_t digestLen, 
+                    const unsigned char* signature, size_t sigLen,
+                    uint8_t* key_blob, size_t key_size) {
+    int result = 0; // 0 for failure, 1 for success
+    EVP_PKEY* pkey = NULL;
+    EVP_MD_CTX* mdCtx = NULL;
+    EVP_PKEY_CTX* pkeyCtx = NULL;
+
+    
+
+    // Load public key
+    const unsigned char* p = g_Keys[keyIndex];
+    pkey = d2i_PUBKEY(NULL, &p, g_KeySizes[keyIndex]);
+    if (!pkey) {
+        fprintf(stderr, "Error: Failed to load public key %s\n", g_szKeyNames[keyIndex]);
+        continue;
+    }
+
+    // Create and initialize message digest context
+    mdCtx = EVP_MD_CTX_new();
+    if (!mdCtx) {
+        fprintf(stderr, "Error: Failed to create EVP_MD_CTX\n");
+        EVP_PKEY_free(pkey);
+        continue;
+    }
+
+    // Initialize signature verification
+    if (EVP_DigestVerifyInit(mdCtx, &pkeyCtx, EVP_sha256(), NULL, pkey) <= 0) {
+        fprintf(stderr, "Error: EVP_DigestVerifyInit failed for %s\n", g_szKeyNames[keyIndex]);
+        EVP_MD_CTX_free(mdCtx);
+        EVP_PKEY_free(pkey);
+        continue;
+    }
+
+    // Set PSS padding
+    if (EVP_PKEY_CTX_set_rsa_padding(pkeyCtx, RSA_PKCS1_PSS_PADDING) <= 0) {
+        fprintf(stderr, "Error: Failed to set RSA PSS padding for %s\n", g_szKeyNames[keyIndex]);
+        EVP_MD_CTX_free(mdCtx);
+        EVP_PKEY_free(pkey);
+        continue;
+    }
+
+    // Set salt length
+    if (EVP_PKEY_CTX_set_rsa_pss_saltlen(pkeyCtx, 32) <= 0) {
+        fprintf(stderr, "Error: Failed to set RSA PSS salt length for %s\n", g_szKeyNames[keyIndex]);
+        EVP_MD_CTX_free(mdCtx);
+        EVP_PKEY_free(pkey);
+        continue;
+    }
+
+    // Perform signature verification
+    if (EVP_DigestVerify(mdCtx, signature, sigLen, digest, digestLen) == 1) {
+        printf("Valid %s signature detected!\n\n", g_szKeyNames[keyIndex]);
+        result = 1; // Verification succeeded
+        EVP_MD_CTX_free(mdCtx);
+        EVP_PKEY_free(pkey);
+        break;
+    } else {
+        fprintf(stderr, "Error: Signature verification failed for %s\n", g_szKeyNames[keyIndex]);
+    }
+
+    // Clean up for the current key
+    EVP_MD_CTX_free(mdCtx);
+    EVP_PKEY_free(pkey);
+    
+
+    return result;
+}
+
+unsigned char[SHA256_DIGEST_LENGTH] sha256(std::vector<uint8_t>& src)
+{
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, src.data(), src.size());
+    SHA256_Final(hash, &sha256);
+
+    return hash;
+}
+
+bool XanaduXVD::VerifySignature(uint8_t* data, size_t data_len)
+{
+    // RSA_SINGATURE_SIZE
+
+    // 0. Grab the header bytes directly (not the in-memory representation)
+    XVD_HEADER_INCL_SIGNATURE
+    std::vector<uint8_t> header_data(XVD_HEADER_INCL_SIGNATURE);
+
+    // 1. Compute the hash of the header
+    auto digest = sha256(header_data);
+
+    // 2. Compute signature of the hash
+
+    // X. Debug
+    printf("Header Signature:   %s\n");
+    printf("Computed Signature: %s\n");
+
+    // 3. Compare with the signature before the header,
+    if(memcpm (mHeader.rsa_signature,  computed_signature))
+        return true;
+
+    return false;
+}
+
 //////////////////////////////////////////
 // PUBLIC / USER FACING METHODS         //
 //////////////////////////////////////////

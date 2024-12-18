@@ -1,8 +1,10 @@
 /**********************************************************/
-/* XVDLith: Monolithic XVD Parser / playground tool       */
-/*                    2024 (c) TorusHyperV                */
+/*  XanaduXVD: Monolithic XVD Parser / playground tool    */
+/*                          2024                          */
 /*                                                        */
-/*  XanaduXVD.h - Header of an XVD manipulator class      */
+/*   Contributors: TorusHyperV                            */
+/*   File: XanaduXVD.h                                    */
+/*   Desc: Header of an XVD manipulator class             */
 /*                                                        */
 /**********************************************************/
 #pragma once
@@ -11,6 +13,7 @@
 // XanaduXVD includes
 ///////////////////////////////////////
 #include "XVDTypes.h"
+#include "XVDCrypto.h"
 
 ///////////////////////////////////////
 // C includes
@@ -28,6 +31,14 @@
 #include <cmath>
 #include <map>
 #include <bit> // for endianess shenanigans
+
+///////////////////////////////////////
+// OpenSSL includes
+///////////////////////////////////////
+#include <openssl/evp.h>
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#include <openssl/err.h>
 
 class XanaduXVD
 {
@@ -79,6 +90,8 @@ protected:
     uint64_t HashTreeSizeFromPageNum(uint64_t num_pages_to_hash, bool resilient);
     uint64_t FindOccupiedDriveSizeFromBAT(uint64_t bat_offset, uint64_t bat_size);
     uint64_t ComputeUsedDriveSizeInDynamicXVD();
+
+    bool     VerifySignature(uint8_t* data, size_t data_len);
 
 ///////////////////////////////////////
 // PUBLIC FUNCTIONALITY / METHODS    //

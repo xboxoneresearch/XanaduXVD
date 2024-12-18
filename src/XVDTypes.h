@@ -6,7 +6,6 @@
 /*               intrinsic to the XVD Format.             */
 /*                                                        */
 /**********************************************************/
-
 #pragma once
 
 ///////////////////////////////////////
@@ -236,7 +235,7 @@ struct XvdHeader
     uint32_t        dynamic_header_length;               // 0x294
     uint32_t        block_size;                          // 0x298
 
-    XvdExtEntry   ExtEntry[4];
+    XvdExtEntry     ExtEntry[4];
     uint16_t        Capabilities[8]; // Capabilities seem unused / unknown
 
     uint8_t         PECatalogHash[ROOT_HASH_LENGTH];
