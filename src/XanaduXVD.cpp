@@ -95,6 +95,7 @@ int XanaduXVD::Start(bool unsafe_mode, bool debug_mode)
         fprintf(stderr, "ERR: Failed to open file '%s'!\n", mFilename.c_str());
         return 2;
     }
+    fprintf(stdout, "INFO: XVD opened in %s mode\n", mUnsafeMode ? "unsafe" : "safe");
 
     // Save file descriptor
     mFD = f;
@@ -134,7 +135,10 @@ int XanaduXVD::Start(bool unsafe_mode, bool debug_mode)
     if(!IsValidHeader())
     {
         fprintf(stderr, "ERR: File '%s' -> Header verification failed\n", mFilename.c_str());
-        return 4;
+        if(!mUnsafeMode)
+            return 4;
+        else
+        fprintf(stdout, "INFO: Ignoring errors in unsafe mode. Moving on...\n");
     }
 
     // If we have verified the header, we can do some parsing

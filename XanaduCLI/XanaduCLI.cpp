@@ -18,6 +18,7 @@ void PrintHelp()
                   "Options:\n"\
                   " --file:                           Specifies the input XVD file\n"\
                   " --info:                           Displays information about the XVD\n"\
+                  " --unsafe:                         Parses XVD even if header is not valid (might crash)\n"\
                   " --extract_exvd [output_filename]: Extract Embedded XVD\n"\
                   " --extract_udat [output_filename]: Extract UserData\n"\
                   " --verify_htree:                   Verify HashTree\n"\
@@ -37,6 +38,7 @@ int main(int argc, char *argv[])
     {
         {"file",          required_argument,    nullptr, 'f'},
         {"info",          no_argument,          nullptr, 'i'},
+        {"unsafe",        no_argument,          nullptr, 's'},
         {"extract_exvd",  required_argument,    nullptr, 'e'},
         {"extract_udat",  required_argument,    nullptr, 'u'},
         {"verify_htree",  no_argument,          nullptr, 'v'},
@@ -53,9 +55,10 @@ int main(int argc, char *argv[])
     bool extract_udat = false;
     bool verify_hasht = false;
     bool rebuild_hash = false;
+    bool unsafe       = false;
     char* filename    = nullptr;
 
-    const char* const short_opts = "f:euvrh";
+    const char* const short_opts = "f:iseuvrh";
     while( (opt = getopt_long(argc, argv, short_opts, long_opts, &long_index)) != -1 )
     {
         switch(opt)
@@ -65,6 +68,9 @@ int main(int argc, char *argv[])
                 break;
             case 'e':
                 extract_exvd = true;
+                break;
+            case 's':
+                unsafe       = true;
                 break;
             case 'u':
                 extract_udat = true;
@@ -99,7 +105,7 @@ int main(int argc, char *argv[])
     XanaduXVD xvd(filename);
 
     // Start XanaduXVD
-    if(auto ret = xvd.Start(false, true); ret)
+    if(auto ret = xvd.Start(unsafe, true); ret)
     {
         fprintf(stderr, "Failed to manipulate XVD: %s - reason: %d\n", argv[0], ret);
         return 1;
